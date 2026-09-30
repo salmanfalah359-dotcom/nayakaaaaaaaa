@@ -1,0 +1,248 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #18181b;
+
+  /* NAYAKA Brand Colors */
+  --nayaka-brown: #5d4037;
+  --nayaka-brown-dark: #432c25;
+  --nayaka-brown-light: #7a5548;
+  --nayaka-bg-warm: #f8f5f2;
+  --nayaka-text-dark: #18181b;
+  --nayaka-text-muted: #71717b;
+  --nayaka-border: #e4e4e7;
+  --nayaka-surface: #f4f4f5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ─── PERBAIKAN DI SINI ─── */
+/* Hapus overflow-x: hidden dari html & body agar Lenis bisa baca scroll window */
+html {
+  /* overflow-x: hidden; <-- DIHAPUS */
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* overflow-x: hidden; <-- DIHAPUS */
+}
+
+/* NAYAKA Custom Utilities */
+.nayaka-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: var(--nayaka-bg-warm);
+  border-radius: 9999px;
+  font-size: 14px;
+  color: var(--nayaka-brown);
+  font-weight: 500;
+}
+
+.nayaka-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--nayaka-brown);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.nayaka-btn-primary:hover {
+  background: var(--nayaka-brown-dark);
+  transform: translateY(-1px);
+}
+
+.nayaka-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--nayaka-brown);
+  border: 1.5px solid var(--nayaka-brown);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  text-decoration: none;
+}
+
+.nayaka-btn-outline:hover {
+  background: var(--nayaka-bg-warm);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .nayaka-btn-primary,
+  .nayaka-btn-outline {
+    font-size: 12px;
+    padding: 9px 10px;
+    width: auto;
+    min-width: 0;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}
+
+/* Hero: on mobile the complete hero fits inside the first viewport. */
+.hero-section {
+  padding-top: 130px;
+  padding-bottom: 64px;
+}
+
+@media (max-width: 639px) {
+  .hero-section {
+    min-height: 100svh;
+    padding-top: 78px;
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-inner {
+    width: 100%;
+  }
+
+  .hero-title {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 4px;
+  }
+
+  .hero-actions {
+    max-width: 390px;
+  }
+}
+
+@media (max-width: 370px) {
+  .nayaka-btn-primary,
+  .nayaka-btn-outline {
+    font-size: 11px;
+    padding-inline: 8px;
+    gap: 5px;
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-section {
+    padding-top: 130px;
+    padding-bottom: 80px;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding-top: 160px;
+  }
+}
+
+/* Desktop: keep the complete hero composition visible in the first viewport. */
+@media (min-width: 768px) {
+  .hero-section {
+    min-height: calc(100svh - 100px);
+    padding-top: 118px;
+    padding-bottom: 24px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-inner {
+    width: 100%;
+  }
+
+  .hero-tag {
+    margin-bottom: 14px;
+  }
+
+  .hero-gallery {
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+
+  .hero-subtext {
+    margin-bottom: 12px;
+  }
+}
+
+/* Polaroid photo frame effect */
+.polaroid-frame {
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Card hover animation */
+.feature-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient text */
+.gradient-text-brown {
+  background: linear-gradient(180deg, #a0522d 0%, #3a1e10 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Lenis Smooth Scroll Styles ─────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .feature-card,
+  .nayaka-btn-primary,
+  .nayaka-btn-outline {
+    transition: none !important;
+  }
+}
