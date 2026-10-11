@@ -36,15 +36,49 @@ function Tag({
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 
+const navLinks = [
+  { href: "#beranda", label: "Beranda" },
+  { href: "#fitur", label: "Fitur Utama" },
+  { href: "#medis", label: "Dukungan Medis" },
+  { href: "#ekosistem", label: "Ekosistem" },
+  { href: "#paket", label: "Paket Kemitraan" },
+];
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = [
-    { href: "#beranda", label: "Beranda", active: true },
-    { href: "#fitur", label: "Fitur Utama", active: false },
-    { href: "#medis", label: "Dukungan Medis", active: false },
-    { href: "#ekosistem", label: "Ekosistem", active: false },
-    { href: "#paket", label: "Paket Kemitraan", active: false },
-  ];
+  const [activeSection, setActiveSection] = useState("beranda");
+
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const navbarHeight = window.innerWidth >= 768 ? 100 : 72;
+      const activationLine = navbarHeight + 20;
+      if (
+        window.scrollY + window.innerHeight >=
+        document.documentElement.scrollHeight - 2
+      ) {
+        setActiveSection(navLinks[navLinks.length - 1].href.slice(1));
+        return;
+      }
+
+      const sections = navLinks
+        .map(({ href }) => document.getElementById(href.slice(1)))
+        .filter((section): section is HTMLElement => section !== null);
+      const currentSection = [...sections]
+        .reverse()
+        .find((section) => section.getBoundingClientRect().top <= activationLine);
+
+      setActiveSection(currentSection?.id ?? "beranda");
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
 
   return (
     <nav
@@ -67,13 +101,14 @@ function Navbar() {
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-1">
-          {links.map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
+              aria-current={activeSection === link.href.slice(1) ? "location" : undefined}
               className={`px-4 lg:px-5 py-3 rounded-full text-[16px] lg:text-[18px] transition-colors duration-200 whitespace-nowrap ${
-                link.active
-                  ? "text-[#5d4037] font-medium"
+                activeSection === link.href.slice(1)
+                  ? "bg-[#f8f5f2] text-[#5d4037] font-medium"
                   : "text-[#71717b] hover:text-[#5d4037] hover:bg-[#f8f5f2] font-normal"
               }`}
             >
@@ -104,13 +139,14 @@ function Navbar() {
       {/* Mobile Menu Dropdown */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-[#f4f4f5] px-5 py-3 flex flex-col gap-1 shadow-xl">
-          {links.map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
+              aria-current={activeSection === link.href.slice(1) ? "location" : undefined}
               className={`px-4 py-3 rounded-xl text-[16px] transition-colors ${
-                link.active
+                activeSection === link.href.slice(1)
                   ? "text-[#5d4037] font-medium bg-[#f8f5f2]"
                   : "text-[#71717b] hover:text-[#5d4037] hover:bg-[#f8f5f2]"
               }`}
@@ -129,17 +165,14 @@ function Navbar() {
 
 function HeroSection() {
   const [videoOpen, setVideoOpen] = useState(false);
-  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
-  const [secondsUntilLaunch, setSecondsUntilLaunch] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!videoOpen && !maintenanceOpen) return;
+    if (!videoOpen) return;
 
     const previousOverflow = document.body.style.overflow;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setVideoOpen(false);
-        setMaintenanceOpen(false);
       }
     };
 
@@ -150,28 +183,7 @@ function HeroSection() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [videoOpen, maintenanceOpen]);
-
-  useEffect(() => {
-    if (!maintenanceOpen) return;
-
-    const launchAt = Date.UTC(2026, 9, 13, 1, 0, 0);
-    const updateCountdown = () => {
-      setSecondsUntilLaunch(Math.max(0, Math.ceil((launchAt - Date.now()) / 1000)));
-    };
-
-    updateCountdown();
-    const intervalId = window.setInterval(updateCountdown, 1000);
-    return () => window.clearInterval(intervalId);
-  }, [maintenanceOpen]);
-
-  const countdown = secondsUntilLaunch ?? 0;
-  const countdownParts = [
-    { label: "Hari", value: Math.floor(countdown / 86400) },
-    { label: "Jam", value: Math.floor((countdown % 86400) / 3600) },
-    { label: "Menit", value: Math.floor((countdown % 3600) / 60) },
-    { label: "Detik", value: countdown % 60 },
-  ];
+  }, [videoOpen]);
 
   return (
     <>
@@ -269,9 +281,10 @@ function HeroSection() {
         </p>
 
         <div className="hero-actions flex flex-row items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-0 sm:px-4">
-          <button
-            type="button"
-            onClick={() => setMaintenanceOpen(true)}
+          <a
+            href="https://nayaka-demo.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
             className="nayaka-btn-primary flex-1 sm:flex-none text-center justify-center"
           >
             Coba <em>Game</em> Sekarang
@@ -282,7 +295,7 @@ function HeroSection() {
               height={21}
               className="w-[18px] h-[18px] sm:w-[21px] sm:h-[21px]"
             />
-          </button>
+          </a>
           <button
             type="button"
             onClick={() => setVideoOpen(true)}
@@ -337,67 +350,6 @@ function HeroSection() {
           >
             Browser Anda tidak mendukung pemutaran video.
           </video>
-        </div>
-      </div>
-    )}
-    {maintenanceOpen && (
-      <div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-4 sm:p-8"
-        onClick={() => setMaintenanceOpen(false)}
-      >
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="maintenance-title"
-          className="relative w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
-          onClick={(event) => event.stopPropagation()}
-        >
-          <div className="flex items-center justify-between bg-[#5d4037] px-5 py-4 text-white sm:px-7">
-            <p className="text-sm font-medium sm:text-base">NAYAKA Web Game</p>
-            <button
-              type="button"
-              onClick={() => setMaintenanceOpen(false)}
-              className="rounded-md p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Tutup pemberitahuan maintenance"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="px-5 py-8 text-center sm:px-8 sm:py-10">
-            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#f8f5f2] text-[#5d4037]">
-              <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l2.5 2.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-            </div>
-            <h2 id="maintenance-title" className="text-2xl font-semibold text-[#18181b] sm:text-3xl">
-              Game Web Sedang Maintenance
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#71717b] sm:text-base">
-              Kami sedang menyiapkan pengalaman bermain NAYAKA. Game dijadwalkan
-              tersedia kembali pada 13 Oktober 2026 pukul 08.00 WIB.
-            </p>
-            {secondsUntilLaunch === null ? (
-              <p className="mt-8 text-sm text-[#71717b]" role="status">Menghitung waktu...</p>
-            ) : secondsUntilLaunch === 0 ? (
-              <p className="mt-8 rounded-lg bg-[#f8f5f2] px-4 py-4 font-medium text-[#5d4037]" role="status">
-                Waktu maintenance terjadwal telah berakhir.
-              </p>
-            ) : (
-              <div className="mt-8 grid grid-cols-4 gap-2 sm:gap-3" aria-label="Hitung mundur menuju pembukaan game">
-                {countdownParts.map(({ label, value }) => (
-                  <div key={label} className="rounded-lg bg-[#f8f5f2] px-2 py-3 sm:py-4">
-                    <p className="text-2xl font-semibold tabular-nums text-[#5d4037] sm:text-3xl">
-                      {String(value).padStart(2, "0")}
-                    </p>
-                    <p className="mt-1 text-xs text-[#71717b] sm:text-sm">{label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <p className="mt-5 text-xs text-[#71717b] sm:text-sm">Waktu mengikuti zona WIB (UTC+7)</p>
-          </div>
         </div>
       </div>
     )}
@@ -673,7 +625,7 @@ function EcosystemSection() {
 const packages = [
   {
     name: "Paket Clip-On",
-    price: "Rp1,926,860",
+    price: "Rp2,103,400",
     highlighted: false,
     features: [
       "10 Akun Pasien (Akses Game & Dashboard)",
@@ -684,7 +636,7 @@ const packages = [
   },
   {
     name: "Paket Lengkap",
-    price: "Rp5,176,860",
+    price: "Rp5,447,000",
     highlighted: true,
     features: [
       "10 Akun Pasien (Akses Game & Dashboard)",
@@ -696,7 +648,7 @@ const packages = [
   },
   {
     name: "Paket Starter",
-    price: "Rp3,551,860",
+    price: "Rp3,775,200",
     highlighted: false,
     features: [
       "10 Akun Pasien (Akses Game & Dashboard)",
